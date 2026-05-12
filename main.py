@@ -5,9 +5,9 @@ import time
 # Pin Setup
 # -----------------------------
 
-light_sensor = ADC(26)      # Photoresistor on GP26 / ADC0
-brightness_knob = ADC(27)   # Potentiometer on GP27 / ADC1
-pir_sensor = Pin(14, Pin.IN)
+light_sensor = ADC(26)      
+brightness_knob = ADC(27)
+pir_sensor = Pin(14, Pin.IN, Pin.PULL_DOWN)
 
 led = PWM(Pin(15))
 led.freq(1000)
@@ -16,18 +16,18 @@ led.freq(1000)
 # Settings
 # -----------------------------
 
-DARK_THRESHOLD = 25000
-OFF_DELAY_SECONDS = 30
+DARK_THRESHOLD = 35000
+OFF_DELAY_SECONDS = 20
 
 last_motion_time = 0
 light_on = False
 
 
-def read_average_adc(sensor, samples=10):
+def read_average_adc(sensor, samples=3):
     total = 0
     for _ in range(samples):
         total += sensor.read_u16()
-        time.sleep(0.01)
+        time.sleep(0.005)
     return total // samples
 
 
@@ -36,12 +36,12 @@ def set_led_brightness(value):
 
 
 def turn_off_led():
-    set_led_brightness(0)
+    led.duty_u16(0)
 
 
 print("Adaptive Smart Night Light Started")
 print("Waiting for PIR sensor to warm up...")
-time.sleep(10)
+time.sleep(30)
 print("System ready.")
 
 while True:
@@ -71,4 +71,4 @@ while True:
         "| LED On:", light_on
     )
 
-    time.sleep(0.2)
+    time.sleep(0.1)
